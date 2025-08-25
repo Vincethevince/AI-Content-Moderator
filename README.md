@@ -1,5 +1,5 @@
 # AI-Content-Moderator
-SafeText AI: A scalable AI-powered content moderation tool that detects hate speech and spam in text using fine-tuned BERT models. Features a FastAPI endpoint, ethical bias analysis via SHAP, and deployment on Google Cloud. Built for real-world platforms like YouTube to ensure safe user interactions.
+A scalable AI-powered content moderation tool that detects hate speech and spam in text using fine-tuned BERT models. Features a FastAPI endpoint, ethical bias analysis via SHAP, and deployment on Google Cloud. Built for real-world platforms like YouTube to ensure safe user interactions.
 
 ## Features (planned)
 - **Hate Speech Detection**: Classifies text as toxic/non-toxic with >90% accuracy using BERT.
@@ -15,4 +15,4 @@ SafeText AI: A scalable AI-powered content moderation tool that detects hate spe
 - **Monitoring**: Prometheus (planned)
 
 ## Pipeline (planned)
-![AI Content Moderator Pipeline](/docs/pipeline.png)
+![AI Content Moderator Pipeline](https://github.com/Vincethevince/AI-Content-Moderator/blob/main/docs/pipeline.jpg)
