@@ -13,3 +13,6 @@ SafeText AI: A scalable AI-powered content moderation tool that detects hate spe
 - **API**: FastAPI
 - **Deployment**: Google Cloud Vertex AI or Heroku
 - **Monitoring**: Prometheus (planned)
+
+## Pipeline (planned)
+![AI Content Moderator Pipeline](/docs/pipeline.png)
