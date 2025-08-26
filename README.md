@@ -3,7 +3,7 @@ A scalable AI-powered content moderation tool that detects hate speech and spam 
 
 ## Features (planned)
 - **Hate Speech Detection**: Classifies text as toxic/non-toxic with >90% accuracy using BERT.
-- **Ethical AI**: Bias analysis with SHAP to ensure fairness.
+- **Ethical AI**: Bias analysis with SHAP to ensure fairness. (Stage 2)
 - **Scalable API**: FastAPI endpoint for real-time moderation.
 - **Deployment**: Hosted on Google Cloud Vertex AI for scalability.
 
