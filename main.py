@@ -5,11 +5,15 @@ import uvicorn
 
 app = FastAPI()
 model = BertForSequenceClassification.from_pretrained('models/bert_finetuned_baseline')
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('models/bert-base-uncased')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 label_cols = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
+
+@app.get("/")
+async def health_check():
+    return {"status": "healthy"}
 
 @app.post("/predict")
 async def predict(data: dict):
