@@ -1,0 +1,7 @@
+docs/
+data/
+notebooks/
+outputs/
+venv/
+__pycache__
+*.pyc
