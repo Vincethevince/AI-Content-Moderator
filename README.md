@@ -5,14 +5,37 @@ A scalable AI-powered content moderation tool that detects hate speech and spam 
 - **Hate Speech Detection**: Classifies text as toxic/non-toxic with >90% accuracy using BERT.
 - **Ethical AI**: Bias analysis with SHAP to ensure fairness. (Stage 2)
 - **Scalable API**: FastAPI endpoint for real-time moderation.
-- **Deployment**: Hosted on Google Cloud Vertex AI for scalability.
+- **Deployment**: Hosted on Google Cloud for scalability.
 
 ## Tech Stack (planned)
 - **ML**: Hugging Face Transformers (BERT), TensorFlow, scikit-learn
 - **Data**: Pandas, Kaggle Toxic Comment Dataset
 - **API**: FastAPI
-- **Deployment**: Google Cloud Vertex AI or Heroku
+- **Deployment**: Google Cloud, Docker
 - **Monitoring**: Prometheus (planned)
 
 ## Pipeline (planned)
 ![AI Content Moderator Pipeline](https://github.com/Vincethevince/AI-Content-Moderator/blob/main/docs/pipeline.jpg)
+
+## Current Roadmap
+- [x] Finetune BERT for baseline model -> 0.973 ROC-AUC score (evaluation used in official challenge)
+- [x] Deploy baseline model in Google Cloud
+- [ ] Create GUI using streamlit to make the system more usable
+- [ ] Test and optimize different models to improve result quality (utilize Google Collab to speed up)
+- [ ] Add user feedback regarding predictions for RLHF
+- [ ] Switch datasets to include bias and introduce SHAP
+
+## Example Usage
+As long as the GUI is not implemented, the system can be tested using a python script like: 
+```
+import requests
+url = "https://ai-content-moderator-822949816423.europe-west1.run.app/predict"
+data = {"text": "Put your toxic comment here"}
+response = requests.post(url, json=data)
+print(response.json()["response"])
+``` 
+
+Or you can test it with curl:
+```
+curl -X POST https://ai-content-moderator-822949816423.europe-west1.run.app/predict -H "Content-Type: application/json" -d '{"text":"Put your toxic comment here"}'
+```
