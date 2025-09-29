@@ -26,7 +26,8 @@ A scalable AI-powered content moderation tool that detects hate speech and spam 
 - [ ] Switch datasets to include bias and introduce SHAP
 
 ## Example Usage
-As long as the GUI is not implemented, the system can be tested using a python script like: 
+GUI is available here: https://ai-content-moderator-gui-822949816423.europe-west1.run.app/
+If you want to test it without the GUI, you can do it by following:
 ```
 import requests
 url = "https://ai-content-moderator-822949816423.europe-west1.run.app/predict"
