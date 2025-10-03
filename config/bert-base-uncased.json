@@ -1,0 +1,9 @@
+{
+    "lm_model_name": "bert-base-uncased",
+    "max_len": 128,
+    "epochs": 2,
+    "down_sample_frac": 0.0,
+    "lr": 2.5e-5,
+    "batch_size": 16,
+    "device": "cuda"
+}
