@@ -5,6 +5,9 @@ from torch.utils.data import DataLoader
 from argparse import ArgumentParser
 from pathlib import Path
 import torch
+from transformers import AdamW, BertForSequenceClassification
+from transformers.optimization import get_linear_scheduler_with_warmup
+import tqdm
 
 def main():
     parser = ArgumentParser()
@@ -47,4 +50,38 @@ def main():
             val_loader = None
 
     
-    
+    with timer("Training model"):
+        model = BertForSequenceClassification.from_pretrained(
+            config["lm_model_name"],
+            num_labels=len(toxicity_labels)
+        )
+        model.to(DEVICE)
+        optimizer = AdamW(
+            model.parameters(),
+            lr=config.get("lr", 2e-5),
+            weight_decay=config.get("weight_decay", 0.01)
+        )
+        scheduler = get_linear_scheduler_with_warmup(
+            optimizer,
+            num_warmup_steps=config.get("warmup", 0)*len(train_loader)*config.get("epochs",2),
+            num_training_steps=len(train_loader)*config.get("epochs",2)
+        )
+        loss_fn = torch.nn.BCEWithLogitsLoss()
+        
+        model.train()
+        for epoch in range(config.get("epochs", 2)):
+            epoch_pbar = tqdm(train_loader, desc=f'Epoch {epoch+1}/{config.get("epochs", 2)}')
+            for batch in epoch_pbar:
+                input_ids, attention_mask, labels = [b.to(DEVICE) for b in batch]
+                outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+                loss = loss_fn(outputs.logits, labels.float())
+                loss.backward()
+                optimizer.step()
+                scheduler.step()
+                optimizer.zero_grad()
+                epoch_pbar.set_postfix(loss=loss.item())
+        model.save_pretrained(OUTPUT_DIR)
+        print(f"Model saved to {OUTPUT_DIR}")
+
+    with timer("Evaluating model"):
+        pass
