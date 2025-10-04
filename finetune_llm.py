@@ -8,6 +8,9 @@ import torch
 from transformers import AdamW, BertForSequenceClassification
 from transformers.optimization import get_linear_scheduler_with_warmup
 import tqdm
+import numpy as np
+import pandas as pd
+from sklearn.metrics import roc_auc_score
 
 def main():
     parser = ArgumentParser()
@@ -84,4 +87,51 @@ def main():
         print(f"Model saved to {OUTPUT_DIR}")
 
     with timer("Evaluating model"):
-        pass
+        model.eval()
+        raw_preds, true_labels = [], []
+        with torch.no_grad():
+            for batch in tqdm(test_loader, desc="Evaluating"):
+                input_ids, attention_mask, labels = [b.to(DEVICE) for b in batch]
+                outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+                raw_preds.extend(outputs.logits.cpu().numpy())
+                true_labels.extend(labels.cpu().numpy())
+
+        raw_preds = np.vstack(raw_preds)
+        true_labels = np.vstack(true_labels)
+        np.savetxt(OUTPUT_DIR/'true_labels.csv', true_labels, delimiter=',', fmt='%d')
+        np.savetxt(OUTPUT_DIR/'predictions.csv', preds, delimiter=',', fmt='%d')
+
+        roc_auc_total = 0
+        for i, label in enumerate(toxicity_labels):
+            roc_auc = roc_auc_score(true_labels[:, i], raw_preds[:, i])
+            roc_auc_total += roc_auc
+            print(f"ROC-AUC for {label}: {roc_auc:.4f}")
+        roc_auc_avg = roc_auc_total / len(toxicity_labels)
+        print(f"Avg ROC-AUC: {roc_auc_avg:.4f}")
+
+        preds = (raw_preds > 0.5).astype(int)
+        f1_total, acc_total, prec_total, rec_total = 0, 0, 0, 0
+        for i, label in enumerate(toxicity_labels):
+            tp = np.sum((true_labels[:, i] == 1) & (preds[:, i] == 1))
+            tn = np.sum((true_labels[:, i] == 0) & (preds[:, i] == 0))
+            fp = np.sum((true_labels[:, i] == 0) & (preds[:, i] == 1))
+            fn = np.sum((true_labels[:, i] == 1) & (preds[:, i] == 0))
+            acc = (tp + tn) / len(true_labels)
+            prec = tp / (tp + fp) if (tp + fp) > 0 else 0
+            rec = tp / (tp + fn) if (tp + fn) > 0 else 0
+            f1 = 2 * (prec * rec) / (prec + rec) if (prec + rec) > 0 else 0
+            print(f"{label}: Acc={acc:.3f}, F1={f1:.3f}, Rec={rec:.3f}, Prec={prec:.3f}")
+            f1_total += f1
+            acc_total += acc
+            prec_total += prec
+            rec_total += rec
+        print(f"Avg F1: {f1_total/len(toxicity_labels):.3f}, Avg Acc: {acc_total/len(toxicity_labels):.3f}")
+
+        submission = pd.DataFrame(df_test['id'],columns=['id'])
+        for i, label in enumerate(toxicity_labels):
+            submission[label] = raw_preds[:, i]
+        submission.to_csv(OUTPUT_DIR/"submission.csv", index=False)
+
+        
+if __name__ == '__main__':
+    main()
