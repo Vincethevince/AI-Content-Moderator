@@ -1,14 +1,14 @@
 # AI-Content-Moderator
 A scalable AI-powered content moderation tool that detects hate speech and spam in text using fine-tuned BERT models. Features a FastAPI endpoint, ethical bias analysis via SHAP, and deployment on Google Cloud. Built for real-world platforms like YouTube to ensure safe user interactions.
 
-## Features (planned)
+## Features
 - **Hate Speech Detection**: Classifies text as toxic/non-toxic with >90% accuracy using BERT.
-- **Ethical AI**: Bias analysis with SHAP to ensure fairness. (Stage 2)
+- **Ethical AI**: Bias analysis with SHAP to ensure fairness. (planned in Stage 2)
 - **Scalable API**: FastAPI endpoint for real-time moderation.
 - **Deployment**: Hosted on Google Cloud for scalability.
 
 ## Tech Stack (planned)
-- **ML**: Hugging Face Transformers (BERT), TensorFlow, scikit-learn
+- **ML**: Hugging Face Transformers (BERT), TensorFlow, Pytorch, scikit-learn
 - **Data**: Pandas, Kaggle Toxic Comment Dataset
 - **API**: FastAPI
 - **Deployment**: Google Cloud, Docker
@@ -20,8 +20,11 @@ A scalable AI-powered content moderation tool that detects hate speech and spam 
 ## Current Roadmap
 - [x] Finetune BERT for baseline model -> 0.973 ROC-AUC score (evaluation used in official challenge)
 - [x] Deploy baseline model in Google Cloud
-- [ ] Create GUI using streamlit to make the system more usable
-- [ ] Test and optimize different models to improve result quality (utilize Google Collab to speed up)
+- [x] Create GUI using streamlit to make the system more usable
+- [ ] Test and optimize different models to improve result quality (utilize Google Collab to speed up) - ongoing
+    * [x] Deploy optimized model -> 0.9854 ROC-AUC score (BERT fine-tuning with whole dataset)
+    * [ ] Undersampling/Oversampling
+    * [ ] Train own model without utilizing BERT
 - [ ] Add user feedback regarding predictions for RLHF
 - [ ] Switch datasets to include bias and introduce SHAP
 
