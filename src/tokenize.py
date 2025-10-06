@@ -9,7 +9,7 @@ class MyTokenizer:
         self.num_workers = num_workers
 
     def _tokenize_single(self, text):
-        return self.tokenizer(text, padding=True, truncation=True, max_length=self.max_length, return_tensors='np')
+        return self.tokenizer(text, padding='max_length', truncation=True, max_length=self.max_length, return_tensors='np')
 
     def tokenize_batch(self, texts):
         with Pool(self.num_workers) as p:
