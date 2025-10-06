@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from tokenize import MyTokenizer
+from .tokenize import MyTokenizer
 import torch
 from torch.utils.data import TensorDataset
 
@@ -28,7 +28,7 @@ def preprocess_data(df):
 
 def prepare_dataset(df, text_column, label_columns):
     # Placeholder to add downsample_frac=0.0
-    tokenizer = MyTokenizer()
+    tokenizer = MyTokenizer(num_workers=4)
     label_vals = df[label_columns].values
     X = tokenizer.tokenize_batch(df[text_column].tolist())
     dataset = TensorDataset(

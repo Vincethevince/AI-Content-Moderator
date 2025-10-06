@@ -1,13 +1,16 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from config.base import toxicity_labels, train_file, test_file, test_labels_file
-from src import load_data, prepare_dataset, load_config
-from src.utils import timer
+from src import load_data, prepare_dataset, load_config, timer
 from torch.utils.data import DataLoader
 from argparse import ArgumentParser
 from pathlib import Path
 import torch
-from transformers import AdamW, BertForSequenceClassification
-from transformers.optimization import get_linear_scheduler_with_warmup
-import tqdm
+from torch.optim import AdamW
+from transformers import BertForSequenceClassification
+from transformers.optimization import get_linear_schedule_with_warmup
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
@@ -18,7 +21,8 @@ def main():
     args = parser.parse_args()
     
     config_path = Path(args.config_file)
-    config = load_config(config_path)
+    abs_config_path = Path.cwd()/config_path
+    config = load_config(abs_config_path)
 
     assert "lm_model_name" in config
 
@@ -27,7 +31,7 @@ def main():
         print("CUDA is not available, switching to CPU.")
         DEVICE = "cpu"
     
-    OUTPUT_DIR = Path(f'../models/{config["lm_model_name"]}_finetuned')
+    OUTPUT_DIR = Path.cwd() / f'models/{config["lm_model_name"]}_finetuned'
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     with timer("Loading and preparing data"):
@@ -64,7 +68,7 @@ def main():
             lr=config.get("lr", 2e-5),
             weight_decay=config.get("weight_decay", 0.01)
         )
-        scheduler = get_linear_scheduler_with_warmup(
+        scheduler = get_linear_schedule_with_warmup(
             optimizer,
             num_warmup_steps=config.get("warmup", 0)*len(train_loader)*config.get("epochs",2),
             num_training_steps=len(train_loader)*config.get("epochs",2)
@@ -87,7 +91,7 @@ def main():
         print(f"Model saved to {OUTPUT_DIR}")
 
     with timer("Evaluating model"):
-        model.eval()
+        model.eval() 
         raw_preds, true_labels = [], []
         with torch.no_grad():
             for batch in tqdm(test_loader, desc="Evaluating"):
@@ -99,7 +103,7 @@ def main():
         raw_preds = np.vstack(raw_preds)
         true_labels = np.vstack(true_labels)
         np.savetxt(OUTPUT_DIR/'true_labels.csv', true_labels, delimiter=',', fmt='%d')
-        np.savetxt(OUTPUT_DIR/'predictions.csv', preds, delimiter=',', fmt='%d')
+        np.savetxt(OUTPUT_DIR/'predictions.csv', raw_preds, delimiter=',', fmt='%d')
 
         roc_auc_total = 0
         for i, label in enumerate(toxicity_labels):
